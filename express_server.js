@@ -21,8 +21,8 @@ function generateRandomString() {
 }
 
 function emailLookUp(emailIn) {
-  for (const id in user) {
-    if (id.email === emailIn) {
+  for (const id in users) {
+    if (users[id].email === emailIn) {
       return true;
     }
   }
@@ -91,7 +91,7 @@ app.post("/urls/logout", (req, res) => {
 
 //Post that updates user base
 app.post("/urls/register", (req, res) => {
-  if (email.email === undefined || email.password === undefined || emailLookUp(req.body.email) === true) {
+  if (req.body.email === "" || req.body.password === "" || emailLookUp(req.body.email) === true) {
     res.send("Error Code 400");
   } else {
     let random = generateRandomString();
@@ -99,6 +99,7 @@ app.post("/urls/register", (req, res) => {
     users[random].id = random;
     users[random].email = req.body.email;
     users[random].password = req.body.password;
+    console.log(users);
     res.redirect(`/urls`);
   }
 })
