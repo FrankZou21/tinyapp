@@ -14,8 +14,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {};
+
 function generateRandomString() {
   return Math.random().toString(36).substr(2, 6);
+}
+
+function emailLookUp(emailIn) {
+  for (const id in user) {
+    if (id.email === emailIn) {
+      return true;
+    }
+  }
+  return false;
 }
 
 app.get("/urls", (req, res) => {
@@ -31,6 +42,14 @@ app.get("/urls/new", (req, res) => {
     username: req.cookies["username"] 
   };
   res.render("urls_new", templateVars);
+});
+ 
+//GET for user registration
+app.get("/urls/register", (req, res) => {
+  let templateVars = { 
+    username: req.cookies["username"]
+  };
+  res.render("urls_registration", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -69,6 +88,20 @@ app.post("/urls/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect(`/urls`);
 });
+
+//Post that updates user base
+app.post("/urls/register", (req, res) => {
+  if (email.email === undefined || email.password === undefined || emailLookUp(req.body.email) === true) {
+    res.send("Error Code 400");
+  } else {
+    let random = generateRandomString();
+    users[random] = [];
+    users[random].id = random;
+    users[random].email = req.body.email;
+    users[random].password = req.body.password;
+    res.redirect(`/urls`);
+  }
+})
 
 //Post for updating urlDatabase with input
 app.post("/urls/:shortURL", (req, res) => {
