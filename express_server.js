@@ -2,6 +2,9 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
+var cookieParser = require('cookie-parser')
+
+app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
@@ -45,13 +48,17 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect(`/urls`); 
 })
 
+//Post for username
+app.post("/urls/login", (req, res) => {
+  res.cookie("username", req.body.username);
+  res.redirect(`/urls`);
+});
+
+//Post for updating urlDatabase with input
 app.post("/urls/:shortURL", (req, res) => {
   urlDatabase[req.params.shortURL] = req.body.longURL;
   res.redirect(`/urls`); 
 });
-
-//Post for username
-app.post("/urls/login")
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
