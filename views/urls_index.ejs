@@ -6,9 +6,17 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title>TinyApp</title>
+  <style>
+      .borderRed {
+        border:3px;
+        border-style:solid;
+        border-color:#FF0000;
+        padding: 1em;
+      }
+      </style>
 </head>
 <header>
-  <% include /partials/_header.ejs %> 
+  <% include ./partials/_header.ejs %> 
 </header>
 <body>
   <main style="margin: 1em;">
@@ -18,6 +26,7 @@
         <tr>
           <th scope="col">Short URL</th>
           <th scope="col">Long URL</th>
+          <th scope="col">Delete</th>
         </tr>
       </thead>
       <tbody>
@@ -25,6 +34,7 @@
           <tr>
             <td><%= url %></td>
             <td><%= urls[url] %></td>
+            <td class = "borderRed"><form method="POST" action="/urls/9sm5xK/delete">Delete</form></td>
           </tr>
         <% } %>
       </tbody>

@@ -29,16 +29,17 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
-});
-
 app.post("/urls", (req, res) => {
   let random = generateRandomString();
   urlDatabase[random] = req.body.longURL;
-  console.log(req.body);
-  res.send(urlDatabase);         // Respond with 'Ok' (we will replace this)
+  res.redirect(`/urls/${random}`); 
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  console.log(longURL);
+  console.log(urlDatabase);
+  res.redirect(longURL);
 });
 
 app.listen(PORT, () => {
