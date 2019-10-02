@@ -54,6 +54,14 @@ app.get("/urls/register", (req, res) => {
   res.render("urls_registration", templateVars);
 });
 
+//GET for login page
+app.get("/urls/login", (req, res) => {
+  let templateVars = { 
+    user: users["user_id"]
+  };
+  res.render("urls_login", templateVars);
+});
+
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { 
     shortURL: req.params.shortURL, 
@@ -107,6 +115,14 @@ app.post("/urls/register", (req, res) => {
     res.redirect(`/urls`);
   }
 })
+
+//Post for login page
+app.post("/urls/login", (req, res) => {
+  let templateVars = { 
+    user: users["user_id"]
+  };
+  res.redirect("/urls", templateVars);
+});
 
 //Post for updating urlDatabase with input
 app.post("/urls/:shortURL", (req, res) => {
