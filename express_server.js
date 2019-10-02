@@ -29,19 +29,26 @@ function emailLookUp(emailIn) {
   return false;
 }
 
-
+function idLookUp(emailIn) {
+  for (const id in users) {
+    if (users[id].email === emailIn) {
+      return id;
+    }
+  }
+  return;
+}
 
 app.get("/urls", (req, res) => {
   let templateVars = { 
     urls: urlDatabase,
-    user: users["user_id"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   let templateVars = { 
-    user: users["user_id"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_new", templateVars);
 });
@@ -49,7 +56,7 @@ app.get("/urls/new", (req, res) => {
 //GET for user registration
 app.get("/urls/register", (req, res) => {
   let templateVars = { 
-    user: users["user_id"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_registration", templateVars);
 });
@@ -57,7 +64,7 @@ app.get("/urls/register", (req, res) => {
 //GET for login page
 app.get("/urls/login", (req, res) => {
   let templateVars = { 
-    user: users["user_id"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_login", templateVars);
 });
@@ -88,15 +95,20 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect(`/urls`); 
 })
 
-//Post for username
+//Post for login page
 app.post("/urls/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect(`/urls`);
+  loginId = idLookUp(req.body.email);
+  if (req.body.email === users[loginId].email && req.body.password === users[loginId].password){
+    res.cookie("user_id", loginId);
+    res.redirect("/urls");
+  } else {
+    res.send("Not a registered user!");
+  }
 });
 
 //Post for logging out
 app.post("/urls/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie("user_id");
   res.redirect(`/urls`);
 });
 
@@ -115,14 +127,6 @@ app.post("/urls/register", (req, res) => {
     res.redirect(`/urls`);
   }
 })
-
-//Post for login page
-app.post("/urls/login", (req, res) => {
-  let templateVars = { 
-    user: users["user_id"]
-  };
-  res.redirect("/urls", templateVars);
-});
 
 //Post for updating urlDatabase with input
 app.post("/urls/:shortURL", (req, res) => {
