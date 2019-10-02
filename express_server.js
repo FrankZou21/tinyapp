@@ -98,6 +98,9 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //Post for login page
 app.post("/urls/login", (req, res) => {
   loginId = idLookUp(req.body.email);
+  if (loginId === undefined) {
+    res.send("Not a registered user!");
+  }
   if (req.body.email === users[loginId].email && req.body.password === users[loginId].password){
     res.cookie("user_id", loginId);
     res.redirect("/urls");
