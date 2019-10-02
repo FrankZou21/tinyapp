@@ -29,17 +29,19 @@ function emailLookUp(emailIn) {
   return false;
 }
 
+
+
 app.get("/urls", (req, res) => {
   let templateVars = { 
     urls: urlDatabase,
-    username: req.cookies["username"] 
+    user: users["user_id"]
   };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   let templateVars = { 
-    username: req.cookies["username"] 
+    user: users["user_id"]
   };
   res.render("urls_new", templateVars);
 });
@@ -47,7 +49,7 @@ app.get("/urls/new", (req, res) => {
 //GET for user registration
 app.get("/urls/register", (req, res) => {
   let templateVars = { 
-    username: req.cookies["username"]
+    user: users["user_id"]
   };
   res.render("urls_registration", templateVars);
 });
@@ -56,7 +58,8 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { 
     shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"]
+    username: req.cookies["username"],
+    user: users["user_id"]
   };
   res.render("urls_show", templateVars);
 });
@@ -95,6 +98,7 @@ app.post("/urls/register", (req, res) => {
     res.send("Error Code 400");
   } else {
     let random = generateRandomString();
+    res.cookie("user_id", random);
     users[random] = [];
     users[random].id = random;
     users[random].email = req.body.email;
