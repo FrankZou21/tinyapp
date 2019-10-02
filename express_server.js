@@ -9,10 +9,17 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
 
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
+// const urlDatabase = {
+//   "b2xVn2": "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com"
+// };
+
+// const urlDatabase = {
+//   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "" },
+//   "9sm5xK": { longURL: "http://www.google.com", userID: "" }
+// };
+
+const urlDatabase = {};
 
 const users = {};
 
@@ -38,10 +45,31 @@ function idLookUp(emailIn) {
   return;
 }
 
+function urlsForUser(id) {
+  let shortUrls = [];
+  for (const urls in urlDatabase) {
+    if(urlDatabase[urls].userID === id) {
+      shortUrls.push(urls);
+    }
+  }
+  return shortUrls;
+}
+
+function mapUrls(arrShortUrls) {
+  let mapUrlsDatabase = new Object();
+  for (const shortUrl of arrShortUrls) {
+    mapUrlsDatabase[shortUrl] = urlDatabase[shortUrl].longUrl;
+  }
+  return mapUrlsDatabase;
+}
+
+//Start of get post
+
 app.get("/urls", (req, res) => {
+  console.log(mapUrls(urlsForUser(req.cookies["user_id"])));
   let templateVars = { 
-    urls: urlDatabase,
-    user: users[req.cookies["user_id"]]
+    urls: mapUrls(urlsForUser(req.cookies["user_id"])),
+    user: users[req.cookies["user_id"]],
   };
   res.render("urls_index", templateVars);
 });
@@ -50,7 +78,11 @@ app.get("/urls/new", (req, res) => {
   let templateVars = { 
     user: users[req.cookies["user_id"]]
   };
-  res.render("urls_new", templateVars);
+  if (req.cookies["user_id"]){
+    res.render("urls_new", templateVars);
+  } else {
+    res.render("urls_login", templateVars);
+  }
 });
  
 //GET for user registration
