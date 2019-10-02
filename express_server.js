@@ -73,8 +73,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { 
     shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"],
-    user: users["user_id"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_show", templateVars);
 });
@@ -126,7 +125,6 @@ app.post("/urls/register", (req, res) => {
     users[random].id = random;
     users[random].email = req.body.email;
     users[random].password = req.body.password;
-    console.log(users);
     res.redirect(`/urls`);
   }
 })
