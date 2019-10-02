@@ -14,30 +14,66 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {};
+
 function generateRandomString() {
   return Math.random().toString(36).substr(2, 6);
+}
+
+function emailLookUp(emailIn) {
+  for (const id in users) {
+    if (users[id].email === emailIn) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function idLookUp(emailIn) {
+  for (const id in users) {
+    if (users[id].email === emailIn) {
+      return id;
+    }
+  }
+  return;
 }
 
 app.get("/urls", (req, res) => {
   let templateVars = { 
     urls: urlDatabase,
-    username: req.cookies["username"] 
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   let templateVars = { 
-    username: req.cookies["username"] 
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_new", templateVars);
+});
+ 
+//GET for user registration
+app.get("/urls/register", (req, res) => {
+  let templateVars = { 
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("urls_registration", templateVars);
+});
+
+//GET for login page
+app.get("/urls/login", (req, res) => {
+  let templateVars = { 
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("urls_login", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { 
     shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_show", templateVars);
 });
@@ -58,17 +94,41 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect(`/urls`); 
 })
 
-//Post for username
+//Post for login page
 app.post("/urls/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect(`/urls`);
+  loginId = idLookUp(req.body.email);
+  if (loginId === undefined) {
+    res.send("Not a registered user!");
+  } else {
+    if (req.body.email === users[loginId].email && req.body.password === users[loginId].password){
+      res.cookie("user_id", loginId);
+      res.redirect("/urls");
+    } else {
+      res.send("Not a registered user!");
+  }
+}
 });
 
 //Post for logging out
 app.post("/urls/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie("user_id");
   res.redirect(`/urls`);
 });
+
+//Post that updates user base
+app.post("/urls/register", (req, res) => {
+  if (req.body.email === "" || req.body.password === "" || emailLookUp(req.body.email) === true) {
+    res.send("Error Code 400");
+  } else {
+    let random = generateRandomString();
+    res.cookie("user_id", random);
+    users[random] = [];
+    users[random].id = random;
+    users[random].email = req.body.email;
+    users[random].password = req.body.password;
+    res.redirect(`/urls`);
+  }
+})
 
 //Post for updating urlDatabase with input
 app.post("/urls/:shortURL", (req, res) => {
