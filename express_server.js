@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
 var cookieParser = require('cookie-parser')
+const bcrypt = require('bcrypt');
 
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
@@ -66,7 +67,6 @@ function mapUrls(arrShortUrls) {
 //Start of get post
 
 app.get("/urls", (req, res) => {
-  console.log(mapUrls(urlsForUser(req.cookies["user_id"])));
   let templateVars = { 
     urls: mapUrls(urlsForUser(req.cookies["user_id"])),
     user: users[req.cookies["user_id"]],
@@ -140,7 +140,7 @@ app.post("/urls/login", (req, res) => {
   if (loginId === undefined) {
     res.send("Not a registered user!");
   } else {
-    if (req.body.email === users[loginId].email && req.body.password === users[loginId].password){
+    if (req.body.email === users[loginId].email && bcrypt.compareSync(req.body.password, users[loginId].password) === true) {
       res.cookie("user_id", loginId);
       res.redirect("/urls");
     } else {
@@ -165,7 +165,8 @@ app.post("/urls/register", (req, res) => {
     users[random] = [];
     users[random].id = random;
     users[random].email = req.body.email;
-    users[random].password = req.body.password;
+    users[random].password = bcrypt.hashSync(req.body.password, 10);
+    console.log(users[random].password);
     res.redirect(`/urls`);
   }
 })
