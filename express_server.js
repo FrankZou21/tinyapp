@@ -58,7 +58,7 @@ function urlsForUser(id) {
 function mapUrls(arrShortUrls) {
   let mapUrlsDatabase = new Object();
   for (const shortUrl of arrShortUrls) {
-    mapUrlsDatabase[shortUrl] = urlDatabase[shortUrl].longUrl;
+    mapUrlsDatabase[shortUrl] = urlDatabase[shortUrl].longURL;
   }
   return mapUrlsDatabase;
 }
@@ -112,12 +112,14 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.post("/urls", (req, res) => {
   let random = generateRandomString();
-  urlDatabase[random] = req.body.longURL;
+  urlDatabase[random] = [];
+  urlDatabase[random].longURL = req.body.longURL;
+  urlDatabase[random].userID = req.cookies["user_id"];
   res.redirect(`/urls/${random}`); 
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
@@ -164,7 +166,8 @@ app.post("/urls/register", (req, res) => {
 
 //Post for updating urlDatabase with input
 app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.longURL;
+  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+  urlDatabase[req.params.shortURL].userID = req.cookies["user_id"];
   res.redirect(`/urls`); 
 });
 
