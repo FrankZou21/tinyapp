@@ -22,6 +22,7 @@ const users = {};
 
 //Start of get post
 
+//Get to render the main page
 app.get("/urls", (req, res) => {
   let templateVars = { 
     urls: mapUrls(urlsForUser(req.session.user_id, urlDatabase), urlDatabase),
@@ -30,6 +31,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+//Get to render urlsnew page or redirects user to login if user is not signed in
 app.get("/urls/new", (req, res) => {
   let templateVars = { 
     user: users[req.session.user_id]
@@ -57,6 +59,7 @@ app.get("/urls/login", (req, res) => {
   res.render("urls_login", templateVars);
 });
 
+//Get to update urls_show page
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { 
     shortURL: req.params.shortURL, 
@@ -66,6 +69,7 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+//Post to update database with urls and user id
 app.post("/urls", (req, res) => {
   let random = generateRandomString();
   urlDatabase[random] = [];
@@ -74,6 +78,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${random}`); 
 });
 
+//Get to obtain longurl and redirects user to that site
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
@@ -92,7 +97,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //Post for login page
 app.post("/urls/login", (req, res) => {
-  loginId = idLookUp(req.body.email, users);
+  let loginId = idLookUp(req.body.email, users);
   if (loginId === undefined) {
     res.send("Not a registered user!");
   } else {

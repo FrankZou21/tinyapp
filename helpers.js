@@ -1,17 +1,17 @@
 const getUserByEmail = function(email, database) {
-  for (const id in database) {
-    if (database[id].email === email) {
-      return database[id];
+  for (const iD in database) {
+    if (database[iD].email === email) {
+      return database[iD].id;
     }
   }
-  return false;
+  return undefined;
 }
 
-function generateRandomString() {
+const generateRandomString = function() {
   return Math.random().toString(36).substr(2, 6);
 }
 
-function idLookUp(emailIn, users) {
+const idLookUp = function(emailIn, users) {
   for (const id in users) {
     if (users[id].email === emailIn) {
       return id;
@@ -20,7 +20,7 @@ function idLookUp(emailIn, users) {
   return;
 }
 
-function urlsForUser(id, database) {
+const urlsForUser = function(id, database) {
   let shortUrls = [];
   for (const urls in database) {
     if(database[urls].userID === id) {
@@ -30,7 +30,7 @@ function urlsForUser(id, database) {
   return shortUrls;
 }
 
-function mapUrls(arrShortUrls, database) {
+const mapUrls = function(arrShortUrls, database) {
   let mapUrlsDatabase = new Object();
   for (const shortUrl of arrShortUrls) {
     mapUrlsDatabase[shortUrl] = database[shortUrl].longURL;
@@ -38,13 +38,10 @@ function mapUrls(arrShortUrls, database) {
   return mapUrlsDatabase;
 }
 
-
-
-
 module.exports = {
   getUserByEmail,
   generateRandomString,
   idLookUp,
   urlsForUser,
   mapUrls
-}
+};
