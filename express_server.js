@@ -18,7 +18,18 @@ app.set("view engine", "ejs");
 
 const urlDatabase = {};
 
-const users = {};
+const users = {
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+};
 
 //Start of get post
 
@@ -61,12 +72,20 @@ app.get("/urls/login", (req, res) => {
 
 //Get to update urls_show page
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { 
-    shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    user: users[req.session.user_id]
-  };
-  res.render("urls_show", templateVars);
+  if (req.session.user_id) {
+    if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
+      let templateVars = { 
+        shortURL: req.params.shortURL, 
+        longURL: urlDatabase[req.params.shortURL].longURL,
+        user: users[req.session.user_id]
+      };
+      res.render("urls_show", templateVars);
+    } else { 
+    res.send("Error you don't own this url!");
+    }
+  } else {
+    res.send("Not logged in");
+  }
 });
 
 //Post to update database with urls and user id
@@ -75,13 +94,18 @@ app.post("/urls", (req, res) => {
   urlDatabase[random] = [];
   urlDatabase[random].longURL = req.body.longURL;
   urlDatabase[random].userID = req.session.user_id;
-  res.redirect(`/urls/${random}`); 
+  res.redirect(`/urls`); 
 });
 
 //Get to obtain longurl and redirects user to that site
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
+  let shortur = Object.keys(urlDatabase);
+  if (shortur.find((element) => {return element === req.params.shortURL;})){
+    const longURL = urlDatabase[req.params.shortURL].longURL;
+    res.redirect(longURL);
+  } else {
+    res.send("The url does not exist");
+  }
 });
 
 
@@ -145,5 +169,3 @@ app.post("/urls/:shortURL", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-
