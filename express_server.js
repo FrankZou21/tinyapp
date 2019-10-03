@@ -37,7 +37,7 @@ const users = {
 app.get("/urls", (req, res) => {
   let templateVars = { 
     urls: mapUrls(urlsForUser(req.session.user_id, urlDatabase), urlDatabase),
-    user: users[req.session.user_id],
+    user: users[req.session.user_id]
   };
   res.render("urls_index", templateVars);
 });
@@ -100,7 +100,7 @@ app.post("/urls", (req, res) => {
 //Get to obtain longurl and redirects user to that site
 app.get("/u/:shortURL", (req, res) => {
   let shortur = Object.keys(urlDatabase);
-  if (shortur.find((element) => {return element === req.params.shortURL;})){
+  if (shortur.find((element) => {return element === req.params.shortURL;})) {
     const longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
   } else {
@@ -115,7 +115,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     delete urlDatabase[req.params.shortURL];
     res.redirect(`/urls`); 
   } else {
-    res.send("Access Denied")
+    res.send("Access Denied");
   }
 })
 
