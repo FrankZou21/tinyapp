@@ -118,7 +118,7 @@ app.post("/urls/logout", (req, res) => {
 
 //Post that updates user base
 app.post("/urls/register", (req, res) => {
-  if (req.body.email === "" || req.body.password === "" || getUserByEmail(req.body.email, users) !== false) {
+  if (req.body.email === "" || req.body.password === "" || getUserByEmail(req.body.email, users) !== undefined) {
     res.send("Error Code 400");
   } else {
     let random = generateRandomString();
