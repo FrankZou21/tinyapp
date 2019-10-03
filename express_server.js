@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 var cookieSession = require('cookie-session')
 const bcrypt = require('bcrypt');
 
+const {getUserByEmail, generateRandomString, idLookUp, urlsForUser, mapUrls } = require("./helpers")
+
 app.use(cookieSession({
   name: 'user_id',
   keys: ['key1', 'key2']
@@ -18,51 +20,11 @@ const urlDatabase = {};
 
 const users = {};
 
-function generateRandomString() {
-  return Math.random().toString(36).substr(2, 6);
-}
-
-function emailLookUp(emailIn) {
-  for (const id in users) {
-    if (users[id].email === emailIn) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function idLookUp(emailIn) {
-  for (const id in users) {
-    if (users[id].email === emailIn) {
-      return id;
-    }
-  }
-  return;
-}
-
-function urlsForUser(id) {
-  let shortUrls = [];
-  for (const urls in urlDatabase) {
-    if(urlDatabase[urls].userID === id) {
-      shortUrls.push(urls);
-    }
-  }
-  return shortUrls;
-}
-
-function mapUrls(arrShortUrls) {
-  let mapUrlsDatabase = new Object();
-  for (const shortUrl of arrShortUrls) {
-    mapUrlsDatabase[shortUrl] = urlDatabase[shortUrl].longURL;
-  }
-  return mapUrlsDatabase;
-}
-
 //Start of get post
 
 app.get("/urls", (req, res) => {
   let templateVars = { 
-    urls: mapUrls(urlsForUser(req.session.user_id)),
+    urls: mapUrls(urlsForUser(req.session.user_id, urlDatabase), urlDatabase),
     user: users[req.session.user_id],
   };
   res.render("urls_index", templateVars);
@@ -130,7 +92,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //Post for login page
 app.post("/urls/login", (req, res) => {
-  loginId = idLookUp(req.body.email);
+  loginId = idLookUp(req.body.email, users);
   if (loginId === undefined) {
     res.send("Not a registered user!");
   } else {
@@ -151,7 +113,7 @@ app.post("/urls/logout", (req, res) => {
 
 //Post that updates user base
 app.post("/urls/register", (req, res) => {
-  if (req.body.email === "" || req.body.password === "" || emailLookUp(req.body.email) === true) {
+  if (req.body.email === "" || req.body.password === "" || getUserByEmail(req.body.email, users) !== false) {
     res.send("Error Code 400");
   } else {
     let random = generateRandomString();
@@ -178,4 +140,5 @@ app.post("/urls/:shortURL", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
 
