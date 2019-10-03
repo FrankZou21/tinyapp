@@ -142,8 +142,12 @@ app.post("/urls/logout", (req, res) => {
 
 //Post that updates user base
 app.post("/urls/register", (req, res) => {
-  if (req.body.email === "" || req.body.password === "" || getUserByEmail(req.body.email, users) !== undefined) {
-    res.send("Error Code 400");
+  if (req.body.email === "") {
+    res.send("Error Code 400, username was left empty");
+  } else if (req.body.password === "") {
+    res.send("Error Code 400, password was left empty");
+  } else if (getUserByEmail(req.body.email, users) !== undefined) {
+    res.send("Error Code 400, username already used");
   } else {
     let random = generateRandomString();
     req.session.user_id = random;
